@@ -2,7 +2,7 @@
 # Set the `sync: false` secrets in the Render dashboard after the first deploy.
 services:
   - type: web
-    name: integratrip-mcp-client
+    name: integratrip-tarea2
     runtime: node
     plan: free
     buildCommand: npm ci && npm run build
@@ -17,7 +17,7 @@ services:
       - key: APP_LOGIN_REALM
         value: pre
       # Set APP_BASE_URL to the service's public URL, e.g.
-      # https://integratrip-mcp-client.onrender.com
+      # https://integratrip-tarea2.onrender.com
       - key: APP_BASE_URL
         sync: false
       - key: DATABASE_URL
@@ -29,4 +29,13 @@ services:
       - key: PRE_CLIENT_ID
         sync: false
       - key: PRE_CLIENT_SECRET
+        sync: false
+      # LLM proxy (gRPC) — Tarea 2
+      - key: LLM_GRPC_TARGET
+        value: iic3103-tarea2-llm-z2fqxmm2ja-uc.a.run.app:443
+      - key: LLM_GRPC_TLS
+        value: "true"
+      - key: LLM_STUDENT_EMAIL
+        sync: false
+      - key: LLM_STUDENT_ID
         sync: false

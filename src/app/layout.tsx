@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IntegraTrip — Cliente MCP",
+  title: "IntegraTrip — Agente de viajes",
   description:
-    "Cliente MCP de IntegraTrip: conecta servidores MCP, descubre y ejecuta sus tools.",
+    "IntegraTrip: agente de IA que planifica viajes usando tools de servidores MCP.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

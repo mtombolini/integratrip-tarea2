@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth/session";
 
 export default async function Home() {
   const session = await getSession();
-  if (session) redirect("/dashboard");
+  if (session) redirect("/chat");
 
   return (
     <main className="flex flex-1 flex-col">
@@ -22,16 +22,15 @@ export default async function Home() {
 
       <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-20">
         <p className="text-sm font-medium uppercase tracking-widest text-slate-500">
-          IIC3103 · Cliente MCP
+          IIC3103 · Agente de viajes con MCP
         </p>
         <h1 className="mt-4 max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          Conecta servidores MCP, descubre sus tools y ejecútalas.
+          Planifica tus vacaciones conversando con un agente de IA.
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-slate-600">
-          IntegraTrip centraliza la planificación de viajes conectándose a
-          servicios externos vía Model Context Protocol. Inicia sesión para
-          conectar tus servidores MCP, listar sus herramientas e invocarlas de
-          forma segura.
+          IntegraTrip conecta vuelos, hoteles y clima vía Model Context
+          Protocol. Conecta tus servidores MCP y pídele al agente que arme tu
+          viaje: busca opciones, te pide confirmación y reserva por ti.
         </p>
         <div className="mt-10">
           <Link
@@ -49,12 +48,12 @@ export default async function Home() {
               d: "OAuth 2.1 + PKCE. Los secretos y tokens viven solo en el servidor.",
             },
             {
-              t: "Descubrimiento de tools",
-              d: "tools/list por cada MCP conectado, con sus parámetros e inputSchema.",
+              t: "Agente de viajes",
+              d: "Un LLM que usa las tools de tus MCP para buscar y reservar, con confirmación previa.",
             },
             {
-              t: "Ejecución de tools",
-              d: "Formularios dinámicos desde inputSchema y resultados legibles.",
+              t: "Historial de chats",
+              d: "Retoma tus conversaciones con el mismo contexto y revisa cada tool ejecutada.",
             },
           ].map((f) => (
             <div
@@ -70,7 +69,7 @@ export default async function Home() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-5xl px-6 py-6 text-sm text-slate-500">
-          IntegraTrip · Tarea 1 IIC3103 — Taller de Integración
+          IntegraTrip · Tareas 1 y 2 IIC3103 — Taller de Integración
         </div>
       </footer>
     </main>

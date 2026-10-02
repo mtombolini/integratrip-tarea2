@@ -6,5 +6,6 @@ import { clearSession } from "@/lib/auth/session";
 // Next.js may prefetch links and execute it before the user clicks logout.
 export async function POST() {
   await clearSession();
-  return NextResponse.redirect(coreEnv().APP_BASE_URL);
+  // 303 converts the form POST into a GET when following the redirect.
+  return NextResponse.redirect(coreEnv().APP_BASE_URL, { status: 303 });
 }

@@ -135,7 +135,7 @@ sequenceDiagram
     AS-->>A: access_token + identidad
     A->>AS: Verifica JWT usando JWKS
     A->>DB: Upsert users
-    A-->>B: Cookie it_session httpOnly + redirect /dashboard
+    A-->>B: Cookie it_session httpOnly + redirect /chat
 ```
 
 ## PRE — Andes Air

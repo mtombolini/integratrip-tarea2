@@ -7,10 +7,11 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  integer,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 // Per-user data hangs off users.id; that is how isolation is enforced.
-// Extensible for Tarea 2 (conversations, messages, tool_invocations).
 
 export const authTypeEnum = pgEnum("auth_type", ["pre", "dcr", "cimd"]);
 export const flowKindEnum = pgEnum("flow_kind", ["login", "connect"]);
@@ -89,8 +90,88 @@ export const oauthFlows = pgTable(
   (t) => [index("oauth_flows_state_idx").on(t.state)],
 );
 
+// ── Tarea 2: chats ─────────────────────────────────────────────────────────
+// chat_messages is the source of truth for the LLM context: replaying the
+// rows of a chat in `seq` order rebuilds the exact USER/MODEL/TOOL history
+// sent to Generate. `error` rows are shown in the UI and replayed as a short
+// MODEL note so the history stays well-formed after an interrupted turn.
+
+export const chatRoleEnum = pgEnum("chat_role", ["user", "model", "tool", "error"]);
+
+export const chats = pgTable(
+  "chats",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("chats_user_updated_idx").on(t.userId, t.updatedAt)],
+);
+
+export type StoredFunctionCall = { id: string; name: string; arguments: unknown };
+export type StoredFunctionResult = {
+  id: string;
+  name: string;
+  result: unknown;
+  isError: boolean;
+};
+
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chats.id, { onDelete: "cascade" }),
+    seq: integer("seq").notNull(),
+    role: chatRoleEnum("role").notNull(),
+    text: text("text"),
+    functionCalls: jsonb("function_calls").$type<StoredFunctionCall[]>(),
+    functionResults: jsonb("function_results").$type<StoredFunctionResult[]>(),
+    // model, latency, token usage, error code… (display/debug only)
+    meta: jsonb("meta").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("chat_messages_chat_seq_uq").on(t.chatId, t.seq)],
+);
+
+// One row per tools/call executed by the agent: which MCP server/connection
+// served it, with what arguments, and what came back.
+export const toolInvocations = pgTable(
+  "tool_invocations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chats.id, { onDelete: "cascade" }),
+    messageId: uuid("message_id")
+      .notNull()
+      .references(() => chatMessages.id, { onDelete: "cascade" }),
+    callId: text("call_id").notNull(),
+    exposedName: text("exposed_name").notNull(), // e.g. pre_search_flights
+    toolName: text("tool_name").notNull(), // name on the MCP server
+    connectionId: uuid("connection_id").references(() => mcpConnections.id, {
+      onDelete: "set null",
+    }),
+    serverName: text("server_name").notNull(),
+    arguments: jsonb("arguments"),
+    result: jsonb("result"),
+    isError: boolean("is_error").notNull().default(false),
+    durationMs: integer("duration_ms"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("tool_invocations_chat_idx").on(t.chatId)],
+);
+
 export type User = typeof users.$inferSelect;
 export type McpConnection = typeof mcpConnections.$inferSelect;
 export type McpClientRegistration = typeof mcpClientRegistrations.$inferSelect;
 export type McpToken = typeof mcpTokens.$inferSelect;
 export type OAuthFlow = typeof oauthFlows.$inferSelect;
+export type Chat = typeof chats.$inferSelect;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type ToolInvocation = typeof toolInvocations.$inferSelect;

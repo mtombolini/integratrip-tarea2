@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
         email,
         studentId: claims.student_id,
       });
-      return NextResponse.redirect(`${base}/dashboard`);
+      return NextResponse.redirect(`${base}/chat`);
     }
 
     // connect flow

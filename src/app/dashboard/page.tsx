@@ -5,7 +5,7 @@ import { listConnections } from "@/lib/connections/repo";
 import { AUTH_TYPE_LABELS } from "@/config/mcp-servers";
 import { ConnectForm } from "@/components/ConnectForm";
 import { DeleteConnectionButton } from "@/components/DeleteConnectionButton";
-import { LogoutButton } from "@/components/LogoutButton";
+import { AppHeader } from "@/components/AppHeader";
 
 export default async function DashboardPage(props: {
   searchParams: Promise<{ error?: string }>;
@@ -18,17 +18,7 @@ export default async function DashboardPage(props: {
 
   return (
     <main className="flex flex-1 flex-col">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-            IntegraTrip
-          </Link>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-slate-600">{session.email}</span>
-            <LogoutButton />
-          </div>
-        </div>
-      </header>
+      <AppHeader email={session.email} active="settings" />
 
       <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
         {error && (
@@ -37,8 +27,20 @@ export default async function DashboardPage(props: {
           </div>
         )}
 
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold tracking-tight">Configuración</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Los MCP que conectes aquí quedan disponibles como tools para el agente
+            del{" "}
+            <Link href="/chat" className="font-medium underline underline-offset-2">
+              Chat
+            </Link>
+            .
+          </p>
+        </div>
+
         <section className="mb-10">
-          <h1 className="text-2xl font-semibold tracking-tight">Conectar un MCP</h1>
+          <h2 className="text-xl font-semibold tracking-tight">Conectar un MCP</h2>
           <p className="mt-1 text-sm text-slate-600">
             Elige un servidor del curso o ingresa una URL MCP. Se te redirigirá al
             servidor de autenticación para autorizar la conexión.

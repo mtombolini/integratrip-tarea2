@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth/session";
 import { getConnection } from "@/lib/connections/repo";
 import { AUTH_TYPE_LABELS } from "@/config/mcp-servers";
 import { ToolsPanel } from "@/components/ToolsPanel";
-import { LogoutButton } from "@/components/LogoutButton";
+import { AppHeader } from "@/components/AppHeader";
 
 export default async function ConnectionPage(props: {
   params: Promise<{ id: string }>;
@@ -18,17 +18,7 @@ export default async function ConnectionPage(props: {
 
   return (
     <main className="flex flex-1 flex-col">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-            IntegraTrip
-          </Link>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-slate-600">{session.email}</span>
-            <LogoutButton />
-          </div>
-        </div>
-      </header>
+      <AppHeader email={session.email} active="settings" />
 
       <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
         <Link

@@ -30,6 +30,20 @@ const loginSchema = z.object({
   PRE_CLIENT_SECRET: z.string().min(1, "PRE_CLIENT_SECRET is required"),
 });
 
+// LLM proxy (gRPC). Student identity is optional here: when unset, the
+// logged-in user's email/student_id (from the AS token) is used instead.
+const llmSchema = z.object({
+  LLM_GRPC_TARGET: z
+    .string()
+    .default("iic3103-tarea2-llm-z2fqxmm2ja-uc.a.run.app:443"),
+  LLM_GRPC_TLS: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((v) => v === "true"),
+  LLM_STUDENT_EMAIL: z.string().optional(),
+  LLM_STUDENT_ID: z.string().optional(),
+});
+
 function parse<T extends z.ZodType>(schema: T, group: string): z.infer<T> {
   const result = schema.safeParse(process.env);
   if (!result.success) {
@@ -45,11 +59,13 @@ let _core: z.infer<typeof coreSchema> | undefined;
 let _db: z.infer<typeof dbSchema> | undefined;
 let _crypto: z.infer<typeof cryptoSchema> | undefined;
 let _login: z.infer<typeof loginSchema> | undefined;
+let _llm: z.infer<typeof llmSchema> | undefined;
 
 export const coreEnv = () => (_core ??= parse(coreSchema, "core"));
 export const dbEnv = () => (_db ??= parse(dbSchema, "db"));
 export const cryptoEnv = () => (_crypto ??= parse(cryptoSchema, "crypto"));
 export const loginEnv = () => (_login ??= parse(loginSchema, "login"));
+export const llmEnv = () => (_llm ??= parse(llmSchema, "llm"));
 
 // Single callback registered with the AS, shared by login + all MCP flows.
 export const redirectUri = () => `${coreEnv().APP_BASE_URL}/callback`;
