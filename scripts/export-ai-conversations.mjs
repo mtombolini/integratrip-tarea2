@@ -3,7 +3,7 @@
 //
 //   node scripts/export-ai-conversations.mjs
 //
-// Redacts: every value in .env.local, JWTs, GitHub tokens, Postgres URLs with
+// Redacts: every value in .env.local, embedded images, JWTs, GitHub tokens, Postgres URLs with
 // credentials and client_secret-like fields. Review the output before committing.
 import fs from "node:fs";
 import os from "node:os";
@@ -36,8 +36,11 @@ const patterns = [
   /(SESSION_SECRET=)\S+/g,
 ];
 
+// Screenshots can show secrets that text redaction can't see: drop them.
+const IMAGE_DATA = /"data":"[A-Za-z0-9+/=]{200,}"/g;
+
 function redact(text) {
-  let out = text;
+  let out = text.replace(IMAGE_DATA, '"data":"[IMAGE REMOVED]"');
   for (const s of secrets) out = out.split(s).join("[REDACTED]");
   for (const p of patterns) {
     out = out.replace(p, (match, prefix) =>
