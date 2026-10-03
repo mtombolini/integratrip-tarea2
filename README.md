@@ -34,8 +34,13 @@ muestra el error; el usuario reintenta enviando un nuevo mensaje.
 access tokens de los MCP nunca salen del servidor. El texto del modelo se
 renderiza con `react-markdown` (sin HTML crudo).
 
-**Conversaciones con IA:** `node scripts/export-ai-conversations.mjs` copia los
-transcripts a `ai-conversations/` censurando secretos.
+**Conversaciones con IA:** los transcripts del desarrollo están en
+[`ai-conversations/`](./ai-conversations) (generados con
+`node scripts/export-ai-conversations.mjs`, que censura secretos).
+
+**Informe de aprendizajes:** [`docs/Informe_Aprendizajes.pdf`](./docs/Informe_Aprendizajes.pdf).
+
+**Despliegue:** https://integratrip-tarea2.onrender.com
 
 ## Stack
 

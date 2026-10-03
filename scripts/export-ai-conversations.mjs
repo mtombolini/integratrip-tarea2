@@ -25,6 +25,14 @@ if (fs.existsSync(envFile)) {
       for (const id of value.split(",")) excluded.add(id.trim());
       continue;
     }
+    // The student number doubles as the course AS password: always redact it.
+    if (m[1] === "LLM_STUDENT_ID" && value) {
+      secrets.add(value);
+      continue;
+    }
+    // Passwords embedded in connection URLs also show up on their own.
+    const pw = value.match(/^[a-z]+:\/\/[^:/@]+:([^@]+)@/i)?.[1];
+    if (pw && pw.length >= 6) secrets.add(pw);
     // Skip short or public values (URLs of course services, realm names…).
     if (value.length >= 12 && !/^https?:\/\//.test(value)) secrets.add(value);
   }
@@ -34,11 +42,12 @@ const patterns = [
   /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, // JWT
   /gh[opsu]_[A-Za-z0-9]{20,}/g, // GitHub tokens
   /rnd_[A-Za-z0-9]{16,}/g, // Render API keys
+  /sb_(?:publishable|secret)_[A-Za-z0-9_-]{16,}/g, // Supabase keys
   /postgres(?:ql)?:\/\/[^:\s"'@]+:[^@\s"']+@/g, // DB URL credentials
   /("?client_secret"?\s*[:=]\s*"?)[A-Za-z0-9_\-.]{12,}/gi,
-  /(PRE_CLIENT_SECRET=)\S+/g,
-  /(ENCRYPTION_KEY=)\S+/g,
-  /(SESSION_SECRET=)\S+/g,
+  /(PRE_CLIENT_SECRET=)[^\s"\\]+/g,
+  /(ENCRYPTION_KEY=)[^\s"\\]+/g,
+  /(SESSION_SECRET=)[^\s"\\]+/g,
 ];
 
 // Screenshots can show secrets that text redaction can't see: drop them.
