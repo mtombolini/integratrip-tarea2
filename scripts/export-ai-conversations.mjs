@@ -14,12 +14,17 @@ const outDir = path.join(root, "ai-conversations");
 const projectsDir = path.join(os.homedir(), ".claude", "projects");
 
 const secrets = new Set();
+const excluded = new Set();
 const envFile = path.join(root, ".env.local");
 if (fs.existsSync(envFile)) {
   for (const line of fs.readFileSync(envFile, "utf8").split("\n")) {
     const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.+?)\s*$/);
     if (!m) continue;
     const value = m[2].replace(/^["']|["']$/g, "");
+    if (m[1] === "AI_EXPORT_EXCLUDE") {
+      for (const id of value.split(",")) excluded.add(id.trim());
+      continue;
+    }
     // Skip short or public values (URLs of course services, realm names…).
     if (value.length >= 12 && !/^https?:\/\//.test(value)) secrets.add(value);
   }
@@ -59,7 +64,7 @@ fs.mkdirSync(outDir, { recursive: true });
 let count = 0;
 for (const dir of dirs) {
   for (const file of fs.readdirSync(dir)) {
-    if (!file.endsWith(".jsonl")) continue;
+    if (!file.endsWith(".jsonl") || excluded.has(file.replace(/\.jsonl$/, ""))) continue;
     const src = path.join(dir, file);
     fs.writeFileSync(path.join(outDir, file), redact(fs.readFileSync(src, "utf8")));
     count++;

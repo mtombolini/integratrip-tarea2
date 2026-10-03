@@ -1,0 +1,22 @@
+name: Keepalive
+
+# Free Supabase projects pause after 7 days without activity and free Render
+# services sleep after 15 min. Ping the deployed app (which queries the DB)
+# every 3 days so the service stays available during the grading period.
+on:
+  schedule:
+    - cron: "17 12 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping app + database
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 20 --retry-all-errors \
+            --max-time 90 "https://integratrip-tarea2.onrender.com/api/health?db=1"

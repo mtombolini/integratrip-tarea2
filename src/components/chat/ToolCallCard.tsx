@@ -17,6 +17,43 @@ function Json({ value }: { value: unknown }) {
   );
 }
 
+function scalar(v: unknown): string {
+  if (v === null || v === undefined) return "—";
+  if (Array.isArray(v)) return `[${v.length}]`;
+  if (typeof v === "object") return "{…}";
+  return String(v);
+}
+
+/** "origin=SCL · destination=CUN · passengers=2" */
+function summarizeArgs(args: unknown): string {
+  if (!args || typeof args !== "object") return scalar(args);
+  const parts = Object.entries(args as Record<string, unknown>).map(
+    ([k, v]) => `${k}=${scalar(v)}`,
+  );
+  return parts.length ? parts.join(" · ") : "sin argumentos";
+}
+
+/** One-line gist of a tool result: error text, confirmation IDs, list sizes. */
+function summarizeResult(result: UiFunctionResult): string {
+  const r = (result.result ?? {}) as Record<string, unknown>;
+  if (result.isError) {
+    const msg = r.error ?? r.message ?? r.text ?? JSON.stringify(r);
+    return String(msg).slice(0, 200);
+  }
+  const parts: string[] = [];
+  for (const [k, v] of Object.entries(r)) {
+    if (typeof v === "string" && /confirm|booking/i.test(k))
+      parts.push(`${k}: ${v}`);
+  }
+  if (typeof r.status === "string") parts.push(`status: ${r.status}`);
+  for (const [k, v] of Object.entries(r)) {
+    if (Array.isArray(v)) parts.push(`${v.length} ${k}`);
+  }
+  if (parts.length) return parts.join(" · ");
+  if (typeof r.text === "string") return r.text.slice(0, 200);
+  return JSON.stringify(r).slice(0, 200);
+}
+
 /** Visible trace of one tool call: name, server, arguments and result/error. */
 export function ToolCallCard({
   call,
@@ -81,9 +118,25 @@ export function ToolCallCard({
             : ""}
         </span>
         <span className="shrink-0 text-xs text-slate-400">
-          {open ? "▾" : "▸"}
+          {open ? "Ocultar ▾" : "Detalle ▸"}
         </span>
       </button>
+      <div className="space-y-1 px-3 pb-2 pl-7 font-mono text-[11px] leading-relaxed">
+        <p className="break-words text-slate-600">
+          <span className="text-slate-400">args </span>
+          {summarizeArgs(call.arguments)}
+        </p>
+        {result && (
+          <p
+            className={`break-words ${result.isError ? "text-red-700" : "text-emerald-700"}`}
+          >
+            <span className="text-slate-400">
+              {result.isError ? "error " : "→ "}
+            </span>
+            {summarizeResult(result)}
+          </p>
+        )}
+      </div>
       {open && (
         <div className="space-y-2 border-t border-slate-200 px-3 py-3">
           <div>
