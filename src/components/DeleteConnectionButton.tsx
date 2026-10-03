@@ -8,7 +8,10 @@ export function DeleteConnectionButton({ id }: { id: string }) {
   const [loading, setLoading] = useState(false);
 
   async function onDelete() {
-    if (!confirm("¿Eliminar esta conexión?")) return;
+    if (
+      !confirm("¿Desconectar este servidor? El agente dejará de ver sus tools.")
+    )
+      return;
     setLoading(true);
     try {
       await fetch(`/api/connections/${id}`, { method: "DELETE" });
@@ -22,9 +25,9 @@ export function DeleteConnectionButton({ id }: { id: string }) {
     <button
       onClick={onDelete}
       disabled={loading}
-      className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-40"
+      className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:opacity-40"
     >
-      {loading ? "…" : "Eliminar"}
+      {loading ? "…" : "Desconectar"}
     </button>
   );
 }

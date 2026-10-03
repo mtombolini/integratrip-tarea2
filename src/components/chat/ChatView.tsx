@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { UiChat, UiFunctionResult, UiMessage } from "@/lib/chats/types";
+import type { UiFunctionResult, UiMessage } from "@/lib/chats/types";
+import { useChats } from "@/components/app/ChatsContext";
 import { Markdown } from "./Markdown";
 import { ToolCallCard, type CallInfo } from "./ToolCallCard";
 import { CatalogPanel } from "./CatalogPanel";
@@ -12,7 +11,11 @@ type StreamEvent =
   | { type: "chat"; chat: { id: string; title: string } }
   | { type: "message"; message: UiMessage }
   | { type: "status"; text: string }
-  | { type: "catalog"; tools: number; warnings: { serverName: string; message: string }[] }
+  | {
+      type: "catalog";
+      tools: number;
+      warnings: { serverName: string; message: string }[];
+    }
   | { type: "fatal"; error: string }
   | { type: "done" };
 
@@ -23,12 +26,10 @@ const SUGGESTIONS = [
 ];
 
 export function ChatView(props: {
-  chats: UiChat[];
   chatId: string | null;
   messages: UiMessage[];
 }) {
-  const router = useRouter();
-  const [chats, setChats] = useState(props.chats);
+  const { chats, upsertChat, newChatSignal } = useChats();
   const [chatId, setChatId] = useState(props.chatId);
   const [messages, setMessages] = useState(props.messages);
   const [input, setInput] = useState("");
@@ -36,8 +37,18 @@ export function ChatView(props: {
   const [status, setStatus] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [showCatalog, setShowCatalog] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const firstSignal = useRef(newChatSignal);
+
+  // "Nueva conversación" from the sidebar: start over with an empty context.
+  useEffect(() => {
+    if (newChatSignal === firstSignal.current) return;
+    firstSignal.current = newChatSignal;
+    setChatId(null);
+    setMessages([]);
+    setNotice(null);
+    setInput("");
+  }, [newChatSignal]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -55,21 +66,6 @@ export function ChatView(props: {
     }
     return { results, infos };
   }, [messages]);
-
-  function startNewChat() {
-    setChatId(null);
-    setMessages([]);
-    setNotice(null);
-    setShowSidebar(false);
-    router.push("/chat");
-  }
-
-  async function removeChat(id: string) {
-    if (!confirm("¿Eliminar esta conversación?")) return;
-    await fetch(`/api/chats/${id}`, { method: "DELETE" });
-    setChats((cs) => cs.filter((c) => c.id !== id));
-    if (id === chatId) startNewChat();
-  }
 
   async function send(text: string) {
     const trimmed = text.trim();
@@ -115,12 +111,8 @@ export function ChatView(props: {
   function handle(ev: StreamEvent) {
     switch (ev.type) {
       case "chat": {
-        const now = new Date().toISOString();
         setChatId(ev.chat.id);
-        setChats((cs) => [
-          { id: ev.chat.id, title: ev.chat.title, updatedAt: now },
-          ...cs.filter((c) => c.id !== ev.chat.id),
-        ]);
+        upsertChat(ev.chat);
         if (window.location.pathname !== `/chat/${ev.chat.id}`) {
           window.history.replaceState(null, "", `/chat/${ev.chat.id}`);
         }
@@ -147,75 +139,22 @@ export function ChatView(props: {
     }
   }
 
-  const sidebar = (
-    <aside className="flex h-full w-72 shrink-0 flex-col border-r border-slate-200 bg-white">
-      <div className="p-3">
-        <button
-          onClick={startNewChat}
-          className="w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-        >
-          + Nueva conversación
-        </button>
-      </div>
-      <p className="px-4 pb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-        Tus conversaciones
-      </p>
-      <ul className="flex-1 space-y-0.5 overflow-y-auto px-2 pb-3">
-        {chats.length === 0 && (
-          <li className="px-2 py-2 text-xs text-slate-400">Aún no hay conversaciones.</li>
-        )}
-        {chats.map((c) => (
-          <li key={c.id} className="group flex items-center">
-            <Link
-              href={`/chat/${c.id}`}
-              onClick={() => setShowSidebar(false)}
-              className={`min-w-0 flex-1 truncate rounded-md px-2 py-2 text-sm ${
-                c.id === chatId
-                  ? "bg-slate-100 font-medium text-slate-900"
-                  : "text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              {c.title}
-            </Link>
-            <button
-              onClick={() => removeChat(c.id)}
-              title="Eliminar"
-              className="ml-1 hidden rounded px-1.5 py-1 text-xs text-slate-400 hover:bg-red-50 hover:text-red-600 group-hover:block"
-            >
-              ✕
-            </button>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  );
-
   return (
     <div className="flex min-h-0 flex-1">
-      <div className="hidden md:flex">{sidebar}</div>
-      {showSidebar && (
-        <div className="fixed inset-0 z-30 flex md:hidden">
-          {sidebar}
-          <button className="flex-1 bg-black/30" onClick={() => setShowSidebar(false)} />
-        </div>
-      )}
-
       <section className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-4 py-2">
-          <button
-            onClick={() => setShowSidebar(true)}
-            className="rounded px-2 py-1 text-sm text-slate-600 hover:bg-slate-100 md:hidden"
-          >
-            ☰
-          </button>
-          <h1 className="truncate text-sm font-medium text-slate-700">
+        <div className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-6">
+          <h1 className="truncate text-sm font-semibold text-slate-800">
             {chats.find((c) => c.id === chatId)?.title ?? "Nueva conversación"}
           </h1>
           <button
             onClick={() => setShowCatalog((v) => !v)}
-            className="ml-auto rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+            className={`ml-auto rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+              showCatalog
+                ? "border-slate-900 bg-slate-900 text-white"
+                : "border-slate-300 text-slate-700 hover:bg-slate-100"
+            }`}
           >
-            🔧 Tools
+            🔧 Tools disponibles
           </button>
         </div>
 
@@ -223,19 +162,22 @@ export function ChatView(props: {
           <div className="mx-auto max-w-3xl space-y-4 px-4 py-6">
             {messages.length === 0 && !busy && (
               <div className="py-16 text-center">
+                <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 text-2xl">
+                  ✈️
+                </div>
                 <h2 className="text-2xl font-semibold tracking-tight">
                   ¿A dónde quieres viajar?
                 </h2>
                 <p className="mt-2 text-sm text-slate-500">
-                  El agente busca vuelos, hoteles y clima en tus MCP conectados, y te pide
-                  confirmación antes de reservar.
+                  El agente busca vuelos, hoteles y clima en tus MCP conectados,
+                  y te pide confirmación antes de reservar.
                 </p>
                 <div className="mt-8 grid gap-2">
                   {SUGGESTIONS.map((s) => (
                     <button
                       key={s}
                       onClick={() => send(s)}
-                      className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 hover:border-slate-400"
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 shadow-sm transition hover:border-slate-400 hover:shadow"
                     >
                       {s}
                     </button>
@@ -248,7 +190,7 @@ export function ChatView(props: {
               if (m.role === "user") {
                 return (
                   <div key={m.id} className="flex justify-end">
-                    <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-slate-900 px-4 py-2.5 text-sm text-white">
+                    <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-slate-900 px-4 py-2.5 text-sm text-white shadow-sm">
                       {m.text}
                     </div>
                   </div>
@@ -257,24 +199,31 @@ export function ChatView(props: {
               if (m.role === "model") {
                 const calls = m.functionCalls ?? [];
                 return (
-                  <div key={m.id} className="space-y-2">
-                    {m.text && (
-                      <div className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-4 py-3">
-                        <Markdown text={m.text} />
-                      </div>
-                    )}
-                    {calls.map((c) => (
-                      <ToolCallCard
-                        key={c.id}
-                        call={c}
-                        result={results.get(c.id)}
-                        info={infos.get(c.id)}
-                        pending={busy}
-                      />
-                    ))}
-                    {!m.text && calls.length === 0 && (
-                      <p className="text-sm italic text-slate-400">(sin respuesta)</p>
-                    )}
+                  <div key={m.id} className="flex gap-3">
+                    <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-sky-400 to-indigo-500 text-[11px] font-bold text-white">
+                      IT
+                    </span>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      {m.text && (
+                        <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                          <Markdown text={m.text} />
+                        </div>
+                      )}
+                      {calls.map((c) => (
+                        <ToolCallCard
+                          key={c.id}
+                          call={c}
+                          result={results.get(c.id)}
+                          info={infos.get(c.id)}
+                          pending={busy}
+                        />
+                      ))}
+                      {!m.text && calls.length === 0 && (
+                        <p className="text-sm italic text-slate-400">
+                          (sin respuesta)
+                        </p>
+                      )}
+                    </div>
                   </div>
                 );
               }

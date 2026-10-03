@@ -17,7 +17,8 @@ export function CatalogPanel({ onClose }: { onClose: () => void }) {
     fetch("/api/catalog")
       .then(async (res) => {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "No se pudo cargar el catálogo");
+        if (!res.ok)
+          throw new Error(data.error ?? "No se pudo cargar el catálogo");
         if (cancelled) return;
         setTools(data.tools);
         setWarnings(data.warnings ?? []);
@@ -42,15 +43,17 @@ export function CatalogPanel({ onClose }: { onClose: () => void }) {
         </button>
       </div>
       <div className="flex-1 space-y-2 overflow-y-auto p-4">
-        {!tools && !error && <p className="text-sm text-slate-500">Cargando…</p>}
+        {!tools && !error && (
+          <p className="text-sm text-slate-500">Cargando…</p>
+        )}
         {error && <p className="text-sm text-red-600">{error}</p>}
         {warnings.map((w) => (
           <p
             key={w.serverName}
             className="rounded-md border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800"
           >
-            {w.serverName}: no se pudieron listar sus tools ({w.message}). Revisa la
-            conexión en Configuración.
+            {w.serverName}: no se pudieron listar sus tools ({w.message}).
+            Revisa la conexión en Configuración.
           </p>
         ))}
         {tools?.length === 0 && (
@@ -65,7 +68,9 @@ export function CatalogPanel({ onClose }: { onClose: () => void }) {
               onClick={() => setExpanded((v) => (v === t.name ? null : t.name))}
             >
               <div className="flex items-center gap-2">
-                <span className="truncate font-mono text-xs font-medium">{t.name}</span>
+                <span className="truncate font-mono text-xs font-medium">
+                  {t.name}
+                </span>
                 <span className="ml-auto shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
                   {t.serverName}
                 </span>

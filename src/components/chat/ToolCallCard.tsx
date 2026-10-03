@@ -30,7 +30,13 @@ export function ToolCallCard({
   pending: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const state = result ? (result.isError ? "error" : "ok") : pending ? "running" : "missing";
+  const state = result
+    ? result.isError
+      ? "error"
+      : "ok"
+    : pending
+      ? "running"
+      : "missing";
 
   const dot = {
     ok: "bg-emerald-500",
@@ -48,7 +54,9 @@ export function ToolCallCard({
   return (
     <div
       className={`rounded-lg border text-sm ${
-        state === "error" ? "border-red-200 bg-red-50/60" : "border-slate-200 bg-white"
+        state === "error"
+          ? "border-red-200 bg-red-50/60"
+          : "border-slate-200 bg-white"
       }`}
     >
       <button
@@ -58,7 +66,9 @@ export function ToolCallCard({
       >
         <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${dot}`} />
         <span className="text-xs text-slate-500">🔧</span>
-        <span className="truncate font-mono text-xs font-medium">{call.name}</span>
+        <span className="truncate font-mono text-xs font-medium">
+          {call.name}
+        </span>
         {info?.serverName && (
           <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">
             {info.serverName}
@@ -66,9 +76,13 @@ export function ToolCallCard({
         )}
         <span className="ml-auto shrink-0 text-[11px] text-slate-500">
           {label}
-          {info?.durationMs !== undefined && result ? ` · ${info.durationMs} ms` : ""}
+          {info?.durationMs !== undefined && result
+            ? ` · ${info.durationMs} ms`
+            : ""}
         </span>
-        <span className="shrink-0 text-xs text-slate-400">{open ? "▾" : "▸"}</span>
+        <span className="shrink-0 text-xs text-slate-400">
+          {open ? "▾" : "▸"}
+        </span>
       </button>
       {open && (
         <div className="space-y-2 border-t border-slate-200 px-3 py-3">
