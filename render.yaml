@@ -2,9 +2,9 @@
 # Set the `sync: false` secrets in the Render dashboard after the first deploy.
 services:
   - type: web
-    # Use a distinct service name so Render does not reuse the legacy Tarea 2
-    # service, which is linked to a different repository.
-    name: integratrip-tarea3
+    # Keep the existing Render resource name so its URL and environment
+    # variables are preserved while the Tarea 3 code is deployed.
+    name: integratrip-tarea2
     runtime: node
     plan: free
     buildCommand: npm ci && npm run build
