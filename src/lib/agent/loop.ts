@@ -17,6 +17,7 @@ import type {
 } from "@/lib/db/schema";
 import { buildCatalog, toLlmTools, type Catalog } from "./catalog";
 import { systemPreamble } from "./prompt";
+import { executeMagazineSearch } from "@/lib/rag/search";
 
 export const MAX_TURNS = 12;
 const MAX_RESULT_CHARS = 30_000;
@@ -133,15 +134,20 @@ async function executeCall(
   let raw: unknown;
   let isError: boolean;
   try {
-    const res = (await callTool(
-      userId,
-      entry.connectionId,
-      entry.toolName,
-      (call.arguments ?? {}) as Record<string, unknown>,
-    )) as McpResult;
+    const res = entry.kind === "local"
+      ? await executeMagazineSearch((call.arguments ?? {}) as Record<string, unknown>)
+      : await callTool(
+          userId,
+          entry.connectionId as string,
+          entry.toolName,
+          (call.arguments ?? {}) as Record<string, unknown>,
+        );
+    const normalized = res as McpResult;
     raw = res;
-    isError = Boolean(res.isError);
-    payload = toModelPayload(res);
+    isError = Boolean(normalized.isError);
+    payload = entry.kind === "local"
+      ? (res as Record<string, unknown>)
+      : toModelPayload(normalized);
   } catch (err) {
     isError = true;
     payload = { error: err instanceof Error ? err.message : String(err) };

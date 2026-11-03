@@ -32,10 +32,18 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
+
+# RAG source PDFs and local Docling caches are reproducible build inputs, not
+# repository artifacts. The processed JSONL under data/processed is tracked.
+/data/raw/
+/data/docling-cache/
+/.venv-rag/
+**/__pycache__/
 next-env.d.ts

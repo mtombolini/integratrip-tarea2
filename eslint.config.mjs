@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    ".venv-rag/**",
+    "scripts/rag/__pycache__/**",
   ]),
 ]);
 

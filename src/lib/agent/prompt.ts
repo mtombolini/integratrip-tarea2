@@ -51,8 +51,16 @@ Reglas:
 9. Si una tool devuelve un error, explícalo brevemente y propone cómo seguir.
 10. Responde en el idioma del usuario, usando markdown (negritas, listas, tablas) de forma breve y clara. Escribe nombres de ciudades y aeropuertos con su formato normal (ej. "Santiago (SCL)").`;
 
+  const ragRules = `
+Base de conocimiento de revistas:
+- Para preguntas sobre destinos, cultura, gastronomía, alojamientos o experiencias usa siempre rag_search_magazines antes de responder.
+- En preguntas compuestas, descompón la intención en hasta cinco queries concretas en español y envíalas en el campo queries.
+- Responde únicamente con información contenida en los fragmentos devueltos por esa tool. Cita siempre la revista y las páginas disponibles.
+- Si los fragmentos no permiten responder razonablemente, responde exactamente: "No encontré información suficiente en las revistas proporcionadas."
+- No inventes datos, no completes con conocimiento general y no uses una tool MCP para sustituir la búsqueda de revistas.`;
+
   return [
-    { role: "USER", text: instructions },
+    { role: "USER", text: instructions + ragRules },
     {
       role: "MODEL",
       text: "Entendido. Seguiré estas reglas y pediré confirmación antes de cualquier reserva.",

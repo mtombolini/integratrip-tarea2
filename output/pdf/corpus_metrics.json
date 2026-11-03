@@ -1,0 +1,377 @@
+{
+  "issues": [
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78
+  ],
+  "issue_counts": {
+    "58": 317,
+    "59": 338,
+    "60": 313,
+    "61": 337,
+    "62": 327,
+    "63": 279,
+    "64": 312,
+    "65": 378,
+    "66": 344,
+    "67": 358,
+    "68": 402,
+    "69": 376,
+    "70": 366,
+    "71": 378,
+    "72": 376,
+    "73": 363,
+    "74": 363,
+    "75": 358,
+    "76": 359,
+    "77": 368,
+    "78": 354
+  },
+  "chunks": 7366,
+  "characters": 3645377,
+  "pages_min": 1,
+  "pages_max": 128,
+  "unique_ids": 7366,
+  "duplicate_text_groups": 29,
+  "duplicate_text_chunks": 256,
+  "potentially_noisy_chunks": 152,
+  "top_terms": [
+    [
+      "ciudad",
+      1425
+    ],
+    [
+      "historia",
+      1158
+    ],
+    [
+      "cocina",
+      873
+    ],
+    [
+      "hotel",
+      834
+    ],
+    [
+      "restaurante",
+      798
+    ],
+    [
+      "solo",
+      744
+    ],
+    [
+      "vino",
+      743
+    ],
+    [
+      "lugar",
+      742
+    ],
+    [
+      "experiencia",
+      740
+    ],
+    [
+      "está",
+      682
+    ],
+    [
+      "mundo",
+      593
+    ],
+    [
+      "tradición",
+      585
+    ],
+    [
+      "años",
+      580
+    ],
+    [
+      "viaje",
+      577
+    ],
+    [
+      "siglo",
+      566
+    ],
+    [
+      "arte",
+      563
+    ],
+    [
+      "cultura",
+      558
+    ],
+    [
+      "gastronomía",
+      548
+    ],
+    [
+      "sino",
+      547
+    ],
+    [
+      "naturaleza",
+      526
+    ],
+    [
+      "vinos",
+      521
+    ],
+    [
+      "ofrece",
+      513
+    ],
+    [
+      "museo",
+      507
+    ],
+    [
+      "tiempo",
+      497
+    ],
+    [
+      "agua",
+      493
+    ]
+  ],
+  "top_headings": [
+    [
+      "Bienvenido a bordo",
+      72
+    ],
+    [
+      "VIAJES",
+      67
+    ],
+    [
+      "HISTORIA, ARTE Y CULTURA",
+      50
+    ],
+    [
+      "Colaboran",
+      46
+    ],
+    [
+      "ENOTURISMO",
+      41
+    ],
+    [
+      "RESTAURANTES PROBADOS",
+      35
+    ],
+    [
+      "LA VENTANA DE MANENA",
+      32
+    ],
+    [
+      "VIAJES DE AUTOR",
+      30
+    ],
+    [
+      "BODEGAS CON ALMA",
+      27
+    ],
+    [
+      "LUGARES PARA SOÑAR",
+      26
+    ],
+    [
+      "CONTENIDOS",
+      25
+    ],
+    [
+      "Cómo llegar",
+      23
+    ],
+    [
+      "Luberon Corazón de la Provenza",
+      23
+    ],
+    [
+      "Ediciones OMO DOMO SL",
+      21
+    ],
+    [
+      "DIRECTORA",
+      21
+    ],
+    [
+      "PUBLICIDAD",
+      21
+    ],
+    [
+      "REDACCIÓN",
+      21
+    ],
+    [
+      "COSTA RICA:",
+      21
+    ],
+    [
+      "ESTADOS UNIDOS:",
+      21
+    ],
+    [
+      "COLOMBIA:",
+      21
+    ]
+  ],
+  "query_previews": [
+    {
+      "label": "playas",
+      "query": "playas",
+      "terms": [
+        "playas"
+      ],
+      "matching_rule": "OR: al menos uno de los términos aparece en el texto",
+      "matching_chunks": 112,
+      "examples": [
+        {
+          "source": "traveling59.pdf",
+          "issue": 59,
+          "pages": [
+            6,
+            7
+          ],
+          "heading": "Viajes de Autor Jamaica Un país que rebosa color"
+        },
+        {
+          "source": "traveling59.pdf",
+          "issue": 59,
+          "pages": [
+            7
+          ],
+          "heading": "Viajes de Autor Jamaica Un país que rebosa color"
+        },
+        {
+          "source": "traveling59.pdf",
+          "issue": 59,
+          "pages": [
+            12
+          ],
+          "heading": "Negri l"
+        }
+      ],
+      "interpretation": "previsualización lexical local; confirmar en Atlas con búsqueda vectorial"
+    },
+    {
+      "label": "castillos",
+      "query": "castillos",
+      "terms": [
+        "castillos"
+      ],
+      "matching_rule": "OR: al menos uno de los términos aparece en el texto",
+      "matching_chunks": 18,
+      "examples": [
+        {
+          "source": "traveling58.pdf",
+          "issue": 58,
+          "pages": [
+            42
+          ],
+          "heading": "Luberon Corazón de la Provenza"
+        },
+        {
+          "source": "traveling59.pdf",
+          "issue": 59,
+          "pages": [
+            29
+          ],
+          "heading": "Belfast"
+        },
+        {
+          "source": "traveling59.pdf",
+          "issue": 59,
+          "pages": [
+            40
+          ],
+          "heading": "DESCUBRIENDO LA REPÚBLICA CHECA EN TREN"
+        }
+      ],
+      "interpretation": "previsualización lexical local; confirmar en Atlas con búsqueda vectorial"
+    },
+    {
+      "label": "comida romántica",
+      "query": "comida romántica",
+      "terms": [
+        "comida",
+        "romántica"
+      ],
+      "matching_rule": "OR: al menos uno de los términos aparece en el texto",
+      "matching_chunks": 203,
+      "examples": [
+        {
+          "source": "traveling58.pdf",
+          "issue": 58,
+          "pages": [
+            75
+          ],
+          "heading": "Sencillez, elegancia y 1 estrella Michelin"
+        },
+        {
+          "source": "traveling58.pdf",
+          "issue": 58,
+          "pages": [
+            98
+          ],
+          "heading": "Mesón A Lareira"
+        },
+        {
+          "source": "traveling58.pdf",
+          "issue": 58,
+          "pages": [
+            105
+          ],
+          "heading": "¿Un restaurante de comida internacional?"
+        }
+      ],
+      "interpretation": "previsualización lexical local; confirmar en Atlas con búsqueda vectorial"
+    }
+  ],
+  "atlas": {
+    "projection_id": "fa545497-39bc-4f71-bbd8-a966e93d396e",
+    "dataset_url": "https://atlas.nomic.ai/data/maximiliano/integratrip-traveling-rag",
+    "map_url": "https://atlas.nomic.ai/data/maximiliano/integratrip-traveling-rag/map"
+  },
+  "atlas_searches": [
+    {
+      "query": "playas",
+      "results": 369,
+      "threshold": "0.59781",
+      "observation": "Beaches Spain + ruido editorial (DIRECTORA)"
+    },
+    {
+      "query": "castillos",
+      "results": 369,
+      "threshold": "0.61005",
+      "observation": "ruta/patrimonio y turismo de naturaleza; relevancia parcial"
+    },
+    {
+      "query": "comida romántica",
+      "results": 369,
+      "threshold": "0.55632",
+      "observation": "La Casa Romántica; gastronomía pertinente"
+    }
+  ]
+}

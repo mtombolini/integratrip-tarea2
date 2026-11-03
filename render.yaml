@@ -2,6 +2,8 @@
 # Set the `sync: false` secrets in the Render dashboard after the first deploy.
 services:
   - type: web
+    # Keep the existing Render resource name so its URL and environment
+    # variables are preserved while the Tarea 3 code is deployed.
     name: integratrip-tarea2
     runtime: node
     plan: free
@@ -39,3 +41,12 @@ services:
         sync: false
       - key: LLM_STUDENT_ID
         sync: false
+      # Nomic Atlas RAG — server-side only (Tarea 3)
+      - key: NOMIC_API_KEY
+        sync: false
+      - key: NOMIC_PROJECTION_ID
+        sync: false
+      - key: NOMIC_API_BASE_URL
+        value: https://api-atlas.nomic.ai
+      - key: NOMIC_EMBEDDING_MODEL
+        value: gte-multilingual-base

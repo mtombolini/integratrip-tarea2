@@ -2,6 +2,7 @@ import { listConnections } from "@/lib/connections/repo";
 import { listTools } from "@/lib/mcp/client";
 import type { LlmTool } from "@/lib/llm/types";
 import type { AuthType } from "@/lib/oauth/types";
+import { RAG_TOOL_NAME } from "@/lib/rag/search";
 
 // Catalog of every tool the user has available across their connected MCPs.
 // MCP tool names collide across servers (list_bookings, …) and the LLM proxy
@@ -10,13 +11,14 @@ import type { AuthType } from "@/lib/oauth/types";
 // back to (connection, original name) when the model calls it.
 
 export type CatalogEntry = {
+  kind: "mcp" | "local";
   exposedName: string;
   toolName: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  connectionId: string;
+  connectionId: string | null;
   serverName: string;
-  authType: AuthType;
+  authType?: AuthType;
 };
 
 export type CatalogWarning = { serverName: string; message: string };
@@ -72,7 +74,31 @@ export async function buildCatalog(userId: string): Promise<Catalog> {
     ordered.map((c) => listTools(userId, c.id)),
   );
 
-  const entries: CatalogEntry[] = [];
+  const entries: CatalogEntry[] = [
+    {
+      kind: "local",
+      exposedName: RAG_TOOL_NAME,
+      toolName: RAG_TOOL_NAME,
+      serverName: "IntegraTrip · revistas",
+      description:
+        "Busca información verificada en las revistas de Traveling Magazine. Úsala para preguntas sobre destinos, cultura, gastronomía, alojamientos y experiencias; entrega varias consultas en español para una pregunta compuesta.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          queries: {
+            type: "array",
+            description: "Una a cinco consultas de búsqueda en español, descompuestas si la pregunta es compuesta.",
+            items: { type: "string" },
+            minItems: 1,
+            maxItems: 5,
+          },
+        },
+        required: ["queries"],
+      },
+      connectionId: null,
+      authType: undefined,
+    },
+  ];
   const warnings: CatalogWarning[] = [];
   const taken = new Set<string>();
   const prefixCount = new Map<string, number>();
@@ -90,6 +116,7 @@ export async function buildCatalog(userId: string): Promise<Catalog> {
 
     for (const tool of res.value) {
       entries.push({
+        kind: "mcp",
         exposedName: exposedName(prefix, tool.name, taken),
         toolName: tool.name,
         description: tool.description ?? tool.title ?? "",
